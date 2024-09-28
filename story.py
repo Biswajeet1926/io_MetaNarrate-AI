@@ -48,14 +48,14 @@ def generate_content(prompt, safety_settings):
         elif hasattr(r, 'prompt_feedback'):
             br = [rating.reason for rating in r.prompt_feedback.safety_ratings if rating.probability == "HIGH"]
             if br:
-                return f"Content generation was blocked due to potential safety concerns: {', '.join(br)}. Please try a different input."
+                return f"The creation of content has been restricted due to possible risks concerning safety.: {', '.join(br)}. Please try with a different input."
             else:
-                return "Content generation was blocked. Please try a different input."
+                return "Content generation was blocked. Please try with a different input."
         else:
-            return "Unable to generate content. Please try again with a different input."
+            return "Unable to generate the content. Please try again with another input."
     except Exception as e:
-        stl.error(f"An error occurred: {str(e)}")
-        return "An error occurred. Please try again."
+        stl.error(f"An error has occurred: {str(e)}")
+        return "An error has occurred. Please try again."
 
 def gen_aud(text: str, lang: str = 'en'):
     try:
@@ -65,20 +65,20 @@ def gen_aud(text: str, lang: str = 'en'):
         au_by = au_bu.getvalue()
         return base64.b64encode(au_by).decode()
     except Exception as e:
-        stl.error(f"An error occurred while generating audio: {str(e)}")
+        stl.error(f"An error has occurred while generating the audio: {str(e)}")
         return None
 
 
 def gen_st(context: str, user_input: str, genre: str, tone: str, length: str) -> str:
     prompt = (
-        f"Continue the story based on the current context and the user's input.\n"
+        f"Continue the story based on the current context and the user's input in an engaging, professional and creative way.\n"
         f"Context: {context}\n"
         f"User Input: {user_input}\n"
         f"Genre: {genre}\n"
         f"Tone: {tone}\n"
         f"Length: {length}\n"
-        f"Continue the story in an engaging and creative way, keeping the narrative cohesive and dynamic. "
-        f"Maintain the specified genre and tone throughout."
+        f"Continue the story in an engaging and creative way, keeping the narrative cohesive and dynamic. Generate the story according to the user's input language."
+        f"Maintain the specified genre and tone throughout the story genration and also maintain the length entered by the user."
     )
     safety_settings = [
         {"category": "HARM_CATEGORY_DANGEROUS", "threshold": "BLOCK_ONLY_HIGH"},
@@ -103,15 +103,15 @@ def gen_aud_pl_html(audio_base64):
     return f"""
         <audio controls autoplay=true>
             <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-            Your browser does not support the audio element.
+            Your browser does not support the audio content. Kindly update it or use some other Browsers.
         </audio>
     """
 
 def wrd_cnt(text):
     return len(re.findall(r'\w+', text))
 
-stl.title("🌟 AI Storyteller: Interactive Narrative Creation")
-stl.write("Embark on a journey of collaborative storytelling with AI. Shape your narrative and watch it come to life!")
+stl.title("🌟 Interactive AI Storyteller: Co-Create Stories with AI")
+stl.write("Embark on a journey of collaborative storytelling with our Interactive AI Storyteller. Shape your own ideas with us and watch them come to life!")
 
 with stl.sidebar:
     stl.header("📝 Story Settings")
@@ -122,10 +122,10 @@ with stl.sidebar:
         length = stl.select_slider("Continuation length", options=["Short", "Medium", "Long"], value="Medium")
         stl.markdown('</div>', unsafe_allow_html=True)
 
-    if stl.button("🔄 Start New Story", key="new_story"):
-        with stl.spinner("Generating a new story starter..."):
+    if stl.button("🔄 Start a New Story", key="new_story"):
+        with stl.spinner("Generating a new story..."):
             gen_ns = gen_st_starter(genre, tone)
-            if not gen_ns.startswith("Content generation was blocked") and not gen_ns.startswith("Unable to generate content"):
+            if not gen_ns.startswith("Content generation was blocked") and not gen_ns.startswith("Unable to generate the content"):
                 stl.session_state.story_context = gen_ns
                 stl.session_state.full_story = gen_ns
                 stl.session_state.turn_count = 0
@@ -156,7 +156,7 @@ with col1:
             with stl.spinner("Weaving your ideas into the narrative tapestry..."):
                 next_part = gen_st(stl.session_state.story_context, user_input, genre, tone, length)
             
-            if not next_part.startswith("Content generation was blocked") and not next_part.startswith("Unable to generate content"):
+            if not next_part.startswith("Content generation was blocked") and not next_part.startswith("Unable to generate the content"):
                 stl.session_state.story_context += f"\nUser Input: {user_input}\nAI Response: {next_part}"
                 stl.session_state.full_story += f"\n\n{next_part}"
                 stl.session_state.turn_count += 1
@@ -207,3 +207,30 @@ with col2:
                     stl.warning(next_part)
             else:
                 stl.warning(surprise_input)
+with stl.sidebar:
+    stl.header("📊 Story Statistics")
+    with stl.container():
+        stl.markdown('<div class="sidebar-content">', unsafe_allow_html=True)
+        stl.metric("Word Count", wrd_cnt(stl.session_state.full_story))
+        stl.metric("Chapters", stl.session_state.turn_count)
+        stl.markdown('</div>', unsafe_allow_html=True)
+
+    progress = stl.progress(min(stl.session_state.turn_count * 10, 100))
+
+    if stl.button("🔊 Generate Full Story Audio"):
+        with stl.spinner("Generating audio for the full story..."):
+            with ThreadPoolExecutor() as executor:
+                full_story_audio = executor.submit(gen_aud, stl.session_state.full_story).result()
+        if full_story_audio:
+            stl.markdown("🎧 Listen to your complete story:")
+            stl.markdown(gen_aud_pl_html(full_story_audio), unsafe_allow_html=True)
+
+    
+    stl.header("📤 Export Your Story")
+    if stl.download_button(
+        label="📄 Download Story",
+        data=stl.session_state.full_story,
+        file_name="my_ai_story.txt",
+        mime="text/plain"
+    ):
+        stl.success("Story downloaded successfully!")
