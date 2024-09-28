@@ -9,3 +9,29 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Set page config
 st.set_page_config(page_title="Interactive AI Storyteller", page_icon="📚", layout="wide")
+
+# Custom CSS
+st.markdown("""
+<style>
+    .stApp {
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+    .stButton>button {
+        background-color: #4CAF50 !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-color) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    .story-container, .sidebar-content {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+""", unsafe_allow_html=True)
