@@ -35,3 +35,5 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+# Configuration for Google Gemini API
+genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
