@@ -140,3 +140,70 @@ if "full_story" not in stl.session_state:
     stl.session_state.full_story = stl.session_state.story_context
 if "turn_count" not in stl.session_state:
     stl.session_state.turn_count = 0
+stl.header("📜 Your Unfolding Tale")
+with stl.container():
+    stl.markdown('<div class="story-container">', unsafe_allow_html=True)
+    stl.markdown(stl.session_state.full_story)
+    stl.markdown('</div>', unsafe_allow_html=True)
+
+stl.header("✍ Shape Your Narrative")
+user_input = stl.text_area("What happens next in your story?", "", height=100)
+
+col1, col2 = stl.columns(2)
+with col1:
+    if stl.button("🚀 Continue Story", key="continue"):
+        if user_input:
+            with stl.spinner("Weaving your ideas into the narrative tapestry..."):
+                next_part = gen_st(stl.session_state.story_context, user_input, genre, tone, length)
+            
+            if not next_part.startswith("Content generation was blocked") and not next_part.startswith("Unable to generate content"):
+                stl.session_state.story_context += f"\nUser Input: {user_input}\nAI Response: {next_part}"
+                stl.session_state.full_story += f"\n\n{next_part}"
+                stl.session_state.turn_count += 1
+
+                stl.success("🌟 The story continues...")
+                with stl.container():
+                    stl.markdown('<div class="story-container">', unsafe_allow_html=True)
+                    stl.markdown(next_part)
+                    stl.markdown('</div>', unsafe_allow_html=True)
+
+                with stl.spinner("Generating audio..."):
+                    with ThreadPoolExecutor() as executor:
+                        new_part_audio = executor.submit(gen_aud, next_part).result()
+                if new_part_audio:
+                    stl.markdown("🔊 Listen to the new part:")
+                    stl.markdown(gen_aud_pl_html(new_part_audio), unsafe_allow_html=True)
+            else:
+                stl.warning(next_part)
+        else:
+            stl.warning("Please enter some input to continue the story.")
+
+with col2:
+    if stl.button("🎭 Surprise Me", key="surprise"):
+        with stl.spinner("Crafting an unexpected turn of events..."):
+            surprise_input = generate_content(f"Generate a surprising event for a {genre} story with a {tone} tone.", [])
+            if not surprise_input.startswith("Content generation was blocked") and not surprise_input.startswith("Unable to generate content"):
+                next_part = gen_st(stl.session_state.story_context, surprise_input, genre, tone, length)
+                
+                if not next_part.startswith("Content generation was blocked") and not next_part.startswith("Unable to generate content"):
+                    stl.session_state.story_context += f"\nSurprise Event: {surprise_input}\nAI Response: {next_part}"
+                    stl.session_state.full_story += f"\n\n{next_part}"
+                    stl.session_state.turn_count += 1
+
+                    stl.success("🎉 A twist in the tale!")
+                    with stl.container():
+                        stl.markdown('<div class="story-container">', unsafe_allow_html=True)
+                        stl.markdown(next_part)
+                        stl.markdown('</div>', unsafe_allow_html=True)
+
+                
+                    with stl.spinner("Generating audio..."):
+                        with ThreadPoolExecutor() as executor:
+                            new_part_audio = executor.submit(gen_aud, next_part).result()
+                    if new_part_audio:
+                        stl.markdown("🔊 Listen to the surprise twist:")
+                        stl.markdown(gen_aud_pl_html(new_part_audio), unsafe_allow_html=True)
+                else:
+                    stl.warning(next_part)
+            else:
+                stl.warning(surprise_input)
