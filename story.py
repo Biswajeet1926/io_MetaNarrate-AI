@@ -92,7 +92,7 @@ def gen_st(context: str, user_input: str, genre: str, tone: str, length: str) ->
 
 @stl.cache_data(ttl=3600)
 def gen_st_starter(genre: str, tone: str) -> str:
-    prompt = f"Create a brief, engaging story starter for a {genre} story with a {tone} tone."
+    prompt = f"Create a brief, engaging story starter for a {genre} story with a {tone} tone with an traditional Indian name."
     safety_settings = [
         {"category": "HARM_CATEGORY_DANGEROUS", "threshold": "BLOCK_ONLY_HIGH"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH"},
