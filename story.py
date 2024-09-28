@@ -112,7 +112,7 @@ def gen_aud_pl_html(audio_base64):
 def wrd_cnt(text):
     return len(re.findall(r'\w+', text))
 
-stl.title("🌟 MetaNarrate AI: Co-Create Stories with AI")
+stl.title("📚 MetaNarrate AI: Co-Create Stories with AI")
 stl.write("Embark on a journey of collaborative storytelling with our Interactive AI Storyteller. Shape your own ideas with us and watch them come to life!")
 
 with stl.sidebar:
