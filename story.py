@@ -6,7 +6,7 @@ from io import BytesIO
 import re
 from concurrent.futures import ThreadPoolExecutor
 
-stl.set_page_config(page_title="Interactive AI Storyteller", page_icon="https://i.postimg.cc/kg0JrH2K/LOGO.png", layout="wide")
+stl.set_page_config(page_title="MetaNarrate AI", page_icon="https://i.postimg.cc/kg0JrH2K/LOGO.png", layout="wide")
 stl.markdown("""
 <style>
     .stApp {
