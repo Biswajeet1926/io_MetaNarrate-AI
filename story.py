@@ -7,7 +7,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 #import os
 
-# Set page config
+# Web page configuration
 st.set_page_config(page_title="Interactive AI Storyteller", page_icon="📚", layout="wide")
 
 # Custom CSS
