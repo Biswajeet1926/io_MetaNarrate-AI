@@ -184,7 +184,7 @@ with col1:
 with col2:
     if stl.button("😯 Surprise Me", key="surprise"):
         with stl.spinner("Crafting an unexpected turn of events..."):
-            surprise_input = generate_content(f"Generate a surprising event for a {genre} story with a {tone} tone. Generate the story according to the user's input language.", [])
+            surprise_input = generate_content(f"Generate a surprising event for a {genre} story with a {tone} tone and with the language used in the previously generated story.", [])
             if not surprise_input.startswith("Content generation was blocked") and not surprise_input.startswith("Unable to generate content"):
                 next_part = gen_st(stl.session_state.story_context, surprise_input, genre, tone, length)
                 
